@@ -1,10 +1,230 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Thesis Oracle dApp</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thesis Oracle - Stellar Soroban dApp</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/web/style.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <div class="decor-circle circle-1"></div>
+    <div class="decor-circle circle-2"></div>
+    
+    <div class="app-container">
+      <header class="app-header">
+        <div class="logo-area">
+          <div class="logo-icon">🎓</div>
+          <div class="logo-text">
+            <h1>Thesis Oracle</h1>
+            <span class="subtitle">Soroban Smart Contract Portal</span>
+          </div>
+        </div>
+        
+        <!-- Wallet Connection Card -->
+        <div class="wallet-bar glass-panel">
+          <div class="wallet-status">
+            <span class="status-dot disconnected" id="walletDot"></span>
+            <span class="status-text" id="walletStatusText">Freighter Disconnected</span>
+          </div>
+          <button id="connectBtn" class="btn btn-primary">Connect Wallet</button>
+          <div class="address-display hidden" id="addressArea">
+            <span class="address-text" id="userAddress">G...</span>
+            <button id="copyAddressBtn" class="btn-icon" title="Copy Address">📋</button>
+            <button id="disconnectBtn" class="btn btn-danger btn-sm">Disconnect</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="dashboard-grid">
+        <!-- LEFT COLUMN: Queries & General Info -->
+        <section class="grid-column">
+          <!-- Public Stats Query -->
+          <div class="glass-panel card">
+            <div class="card-header">
+              <h2>🔍 Query Thesis Status</h2>
+              <p class="card-subtitle">Retrieve live details of any proposed thesis from Stellar Testnet</p>
+            </div>
+            <div class="card-body">
+              <div class="input-group">
+                <input type="number" id="queryThesisId" placeholder="Enter Thesis ID (e.g. 1)" min="1" required />
+                <button id="queryBtn" class="btn btn-secondary">Query Chain</button>
+              </div>
+              
+              <div class="query-result-card hidden" id="queryResult">
+                <div class="result-row">
+                  <span class="label">Thesis ID:</span>
+                  <span class="value" id="resId">-</span>
+                </div>
+                <div class="result-row">
+                  <span class="label">Status:</span>
+                  <span class="badge" id="resBadge">pending</span>
+                </div>
+                <div class="result-row">
+                  <span class="label">Total Votes:</span>
+                  <span class="value highlight" id="resVoteCount">0</span>
+                </div>
+                <div class="result-note" id="resExtraInfo">
+                  Query results are verified on-chain.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Contract Reference -->
+          <div class="glass-panel card info-card">
+            <div class="card-header">
+              <h2>📜 Contract Reference</h2>
+            </div>
+            <div class="card-body">
+              <div class="contract-info">
+                <div class="info-row">
+                  <span class="info-label">Network:</span>
+                  <span class="info-value">Stellar Testnet</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Contract ID:</span>
+                  <span class="info-value code-font address-text" id="contractIdText">CCZI...5EVZA7</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Explorer:</span>
+                  <a href="https://stellar.expert/explorer/testnet/contract/CCZI2TFXGPQGXKNYSKGHYJWONJINEAXINEO7W3EQBYSFNVU5TB5EVZA7" target="_blank" class="link-btn">View on StellarExpert ↗</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Actions / Role Panels -->
+        <section class="grid-column span-2">
+          <!-- Role-Based Dashboard Tabs -->
+          <div class="glass-panel actions-panel">
+            <div class="tabs-header">
+              <button class="tab-btn active" data-tab="candidate-tab">👤 Student / Candidate</button>
+              <button class="tab-btn" data-tab="committee-tab">🗳️ Committee Member</button>
+              <button class="tab-btn" data-tab="chair-tab">👑 Committee Chair</button>
+            </div>
+            
+            <div class="tabs-content">
+              <!-- TAB 1: Candidate Actions -->
+              <div class="tab-pane active" id="candidate-tab">
+                <div class="panel-section">
+                  <h3>Propose New Thesis Defense</h3>
+                  <p class="section-desc">Submit a thesis topic and record its title hash on the blockchain. Requires student authentication.</p>
+                  
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="candidateAddress">Candidate Address (Student)</label>
+                      <input type="text" id="candidateAddress" placeholder="e.g. GB..." required />
+                    </div>
+                    <div class="form-group">
+                      <label for="proposeThesisId">Thesis ID</label>
+                      <input type="number" id="proposeThesisId" placeholder="e.g. 101" min="1" required />
+                    </div>
+                    <div class="form-group full-width">
+                      <label for="proposeTitleHash">Thesis Title Symbol / Hash</label>
+                      <input type="text" id="proposeTitleHash" placeholder="e.g. quantum_computing_thesis" required />
+                      <small class="help-text">Stores a Symbol representing the thesis identity.</small>
+                    </div>
+                  </div>
+                  
+                  <button id="proposeBtn" class="btn btn-primary mt-3 btn-full">Submit Proposal Transaction</button>
+                </div>
+              </div>
+
+              <!-- TAB 2: Committee Actions -->
+              <div class="tab-pane" id="committee-tab">
+                <div class="panel-section">
+                  <h3>Cast Committee Vote</h3>
+                  <p class="section-desc">Register your vote (Approve or Reject) for a specific defense. Requires committee member authorization.</p>
+                  
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="committeeAddress">Committee Member Address</label>
+                      <input type="text" id="committeeAddress" placeholder="e.g. GB..." required />
+                    </div>
+                    <div class="form-group">
+                      <label for="voteThesisId">Thesis ID</label>
+                      <input type="number" id="voteThesisId" placeholder="e.g. 101" min="1" required />
+                    </div>
+                    <div class="form-group full-width">
+                      <label>Your Vote Decision</label>
+                      <div class="vote-toggle-buttons">
+                        <button type="button" class="btn-vote approve active" id="voteApproveBtn" data-value="true">
+                          <span class="icon">✅</span> Approve Thesis
+                        </button>
+                        <button type="button" class="btn-vote reject" id="voteRejectBtn" data-value="false">
+                          <span class="icon">❌</span> Reject Thesis
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button id="voteBtn" class="btn btn-primary mt-3 btn-full">Sign & Cast Vote</button>
+                </div>
+              </div>
+
+              <!-- TAB 3: Chair Actions -->
+              <div class="tab-pane" id="chair-tab">
+                <!-- Section 1: Init -->
+                <div class="panel-section">
+                  <h3>Initialize Oracle Contract</h3>
+                  <p class="section-desc">Set the authorized Committee Chair. This can only be done once upon initial deployment.</p>
+                  
+                  <div class="form-grid">
+                    <div class="form-group full-width">
+                      <label for="chairAddressInit">Committee Chair Address</label>
+                      <input type="text" id="chairAddressInit" placeholder="e.g. GB..." required />
+                    </div>
+                  </div>
+                  
+                  <button id="initBtn" class="btn btn-secondary mt-2 btn-full">Initialize Contract</button>
+                </div>
+                
+                <hr class="divider" />
+                
+                <!-- Section 2: Finalize -->
+                <div class="panel-section">
+                  <h3>Finalize Defense Outcome</h3>
+                  <p class="section-desc">Tally the committee votes and lock the thesis defense on-chain. Only the registered Chair is authorized.</p>
+                  
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label for="chairAddressFinalize">Chair Address</label>
+                      <input type="text" id="chairAddressFinalize" placeholder="e.g. GB..." required />
+                    </div>
+                    <div class="form-group">
+                      <label for="finalizeThesisId">Thesis ID</label>
+                      <input type="number" id="finalizeThesisId" placeholder="e.g. 101" min="1" required />
+                    </div>
+                  </div>
+                  
+                  <button id="finalizeBtn" class="btn btn-danger mt-3 btn-full">Lock & Finalize Defense</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- BOTTOM ROW: Logs Terminal -->
+      <footer class="terminal-section glass-panel">
+        <div class="terminal-header">
+          <div class="terminal-title">
+            <span class="terminal-icon">💻</span>
+            <span>Transaction Logs & Diagnostics Terminal</span>
+          </div>
+          <button id="clearLogsBtn" class="btn-text">Clear Console</button>
+        </div>
+        <div class="terminal-body" id="terminalLogs">
+          <div class="log-line system">Ready. Please connect your Freighter Wallet to begin interacting with the Thesis Oracle contract.</div>
+        </div>
+      </footer>
+    </div>
+    
     <script type="module" src="/web/main.js"></script>
   </body>
 </html>
