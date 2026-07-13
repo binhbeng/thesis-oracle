@@ -2,7 +2,8 @@
   "name": "thesis-oracle-ui",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "build": "vite build"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "^13.3.0"
